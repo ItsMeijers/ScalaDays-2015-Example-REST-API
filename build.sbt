@@ -17,11 +17,7 @@ libraryDependencies ++= Seq(
   "org.scalikejdbc" %% "scalikejdbc-config"                % "2.2.5",
   "org.scalikejdbc" %% "scalikejdbc-play-plugin"           % "2.3.6",
   "org.scalikejdbc" %% "scalikejdbc-test"                  % "2.2.5" % "test",
-
-
   "org.scalikejdbc" %% "scalikejdbc-play-fixture-plugin"   % "2.3.6"
-
-
 )
 
 scalikejdbcSettings
