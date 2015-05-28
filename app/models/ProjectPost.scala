@@ -7,7 +7,7 @@ import play.api.libs.json.Json
  * Example REST API ScalaDays 2015
  * Case class for post data of an Project
  */
-case class ProjectPost(projectName: String, projectDescription: String) {
+case class ProjectPost(projectName: String, projectDescription: String) extends PostData[Project]{
 
   def create: Project = Project.create(projectName, projectDescription)
 

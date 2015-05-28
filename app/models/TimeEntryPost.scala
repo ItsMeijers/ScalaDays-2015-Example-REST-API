@@ -14,7 +14,7 @@ case class TimeEntryPost(
     endTime: DateTime,
     employeeId: Int,
     projectId: Int,
-    comment: Option[String]) {
+    comment: Option[String]) extends PostData[TimeEntry]{
 
   def create: TimeEntry = TimeEntry.create(startTime, endTime, employeeId, projectId, comment)
 

@@ -13,7 +13,7 @@ case class EmployeePost (
   prefix: Option[String] = None,
   lastName: String,
   jobTitle: String,
-  birthDate: LocalDate) {
+  birthDate: LocalDate) extends PostData[Employee]{
 
   def create: Employee = Employee.create(firstName, prefix, lastName, jobTitle, birthDate)
 
