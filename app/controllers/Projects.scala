@@ -59,7 +59,7 @@ object Projects extends BaseController {
     )
   }
 
-  def deleteProject(id: Int) = Action { implicit request =>
+  def deleteProject(id: Int) = Action(parse.empty) { implicit request =>
     Project.find(id) match {
       case Some(project) => project.destroy(); NoContent
       case None => NotFound(errorJson("The requested resource could not be found"))

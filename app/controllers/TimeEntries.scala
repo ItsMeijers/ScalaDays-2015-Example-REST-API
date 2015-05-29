@@ -66,7 +66,7 @@ object TimeEntries extends BaseController{
     )
   }
 
-  def deleteTimeEntry(id: Int) = Action { implicit request =>
+  def deleteTimeEntry(id: Int) = Action(parse.empty) { implicit request =>
     TimeEntry.find(id) match{
       case Some(timeEntry) => timeEntry.destroy(); NoContent
       case None => NotFound(errorJson("The requested resource could not be found"))
