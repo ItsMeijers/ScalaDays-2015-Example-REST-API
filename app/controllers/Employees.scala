@@ -63,7 +63,14 @@ object Employees extends BaseController{
 
   def deleteEmployee(id: Int) = Action(parse.empty) { implicit request =>
     Employee.find(id) match {
-      case Some(employee) => employee.destroy(); NoContent
+      case Some(employee) =>
+        TimeEntry.findByEmployee(id).map{ timeEntry =>
+          timeEntry.destroy()
+        }
+
+        employee.destroy()
+        
+        NoContent
       case None => NotFound(errorJson("The requested resource could not be found"))
     }
   }
