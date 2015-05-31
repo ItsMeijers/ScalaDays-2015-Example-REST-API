@@ -1,33 +1,39 @@
-# Api entry point
-GET           /api                                   controllers.Application.index
+# Routes
+# This file defines all application routes (Higher priority routes first)
+# ~~~~
 
 # API
+
+# Api entry point
+GET           /api                                   @controllers.Application.index
+
 # Projects
-GET           /api/projects                          controllers.Projects.getProjects
-POST          /api/projects                          controllers.Projects.createProject
-GET           /api/projects/search                   controllers.Projects.searchProjects(projectName: String)
-GET           /api/projects/:id                      controllers.Projects.getProject(id: Int)
-GET           /api/projects/:id/time-entries         controllers.Projects.getTimeEntriesForProject(id: Int)
-PUT           /api/projects/:id                      controllers.Projects.editProject(id: Int)
-DELETE        /api/projects/:id                      controllers.Projects.deleteProject(id: Int)
+GET           /api/projects                          @controllers.Projects.getProjects
+POST          /api/projects                          @controllers.Projects.createProject
+GET           /api/projects/search                   @controllers.Projects.searchProjects(projectName: String)
+GET           /api/projects/:id                      @controllers.Projects.getProject(id: Int)
+GET           /api/projects/:id/time-entries         @controllers.Projects.getTimeEntriesForProject(id: Int)
+PUT           /api/projects/:id                      @controllers.Projects.editProject(id: Int)
+DELETE        /api/projects/:id                      @controllers.Projects.deleteProject(id: Int)
 
 #Employees
-GET           /api/employees                         controllers.Employees.getEmployees
-POST          /api/employees                         controllers.Employees.createEmployee
-GET           /api/employees/search                  controllers.Employees.searchEmployees(firstName: Option[String] ?= None, jobTitle: Option[String] ?= None)
-GET           /api/employees/:id                     controllers.Employees.getEmployee(id: Int)
-PUT           /api/employees/:id                     controllers.Employees.editEmployee(id: Int)
-DELETE        /api/employees/:id                     controllers.Employees.deleteEmployee(id: Int)
-GET           /api/employees/:id/projects            controllers.Employees.getProjectsForEmployee(id: Int)
-GET           /api/employees/:id/time-entries        controllers.Employees.getTimeEntriesForEmployee(id: Int)
+GET           /api/employees                         @controllers.Employees.getEmployees
+POST          /api/employees                         @controllers.Employees.createEmployee
+GET           /api/employees/search                  @controllers.Employees.searchEmployees(firstName: Option[String] ?= None, jobTitle: Option[String] ?= None)
+GET           /api/employees/:id                     @controllers.Employees.getEmployee(id: Int)
+PUT           /api/employees/:id                     @controllers.Employees.editEmployee(id: Int)
+DELETE        /api/employees/:id                     @controllers.Employees.deleteEmployee(id: Int)
+GET           /api/employees/:id/projects            @controllers.Employees.getProjectsForEmployee(id: Int)
+GET           /api/employees/:id/time-entries        @controllers.Employees.getTimeEntriesForEmployee(id: Int)
 
 #TimeEntries
-GET           /api/time-entries                      controllers.TimeEntries.getTimeEntries
-POST          /api/time-entries                      controllers.TimeEntries.createTimeEntry
-GET           /api/time-entries/search               controllers.TimeEntries.searchTimeEntries(from: Option[org.joda.time.DateTime] ?= None, to: Option[org.joda.time.DateTime] ?= None)
-GET           /api/time-entries/:id                  controllers.TimeEntries.getTimeEntry(id: Int)
-PUT           /api/time-entries/:id                  controllers.TimeEntries.editTimeEntry(id: Int)
-DELETE        /api/time-entries/:id                  controllers.TimeEntries.deleteTimeEntry(id: Int)
+GET           /api/time-entries                      @controllers.TimeEntries.getTimeEntries
+POST          /api/time-entries                      @controllers.TimeEntries.createTimeEntry
+#GET           /api/time-entries/search               @controllers.TimeEntries.searchTimeEntries(from: Option[org.joda.time.DateTime] ?= None, to: Option[org.joda.time.DateTime] ?= None)
+GET           /api/time-entries/:id                  @controllers.TimeEntries.getTimeEntry(id: Int)
+PUT           /api/time-entries/:id                  @controllers.TimeEntries.editTimeEntry(id: Int)
+DELETE        /api/time-entries/:id                  @controllers.TimeEntries.deleteTimeEntry(id: Int)
+
 
 # Map static resources from the /public folder to the /assets URL path
-GET           /assets/*file                          controllers.Assets.at(path="/public", file)
+GET     /assets/*file               controllers.Assets.versioned(path="/public", file: Asset)

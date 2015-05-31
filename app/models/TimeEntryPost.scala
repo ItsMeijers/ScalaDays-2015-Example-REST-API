@@ -10,11 +10,11 @@ import play.api.libs.json._
  * Case class for post data of an TimeEntry
  */
 case class TimeEntryPost(
-    startTime: DateTime,
-    endTime: DateTime,
-    employeeId: Int,
-    projectId: Int,
-    comment: Option[String]) extends PostData[TimeEntry]{
+                          startTime: DateTime,
+                          endTime: DateTime,
+                          employeeId: Int,
+                          projectId: Int,
+                          comment: Option[String]) {
 
   def create: TimeEntry = TimeEntry.create(startTime, endTime, employeeId, projectId, comment)
 

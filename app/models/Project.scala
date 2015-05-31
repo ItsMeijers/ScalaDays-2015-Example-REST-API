@@ -3,7 +3,7 @@ package models
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scalikejdbc._
-import sqls.distinct
+import scalikejdbc.interpolation.SQLSyntax._
 
 case class Project(
   id: Int,
@@ -16,10 +16,11 @@ case class Project(
 
 }
 
+
 object Project extends SQLSyntaxSupport[Project] {
 
   implicit val projectWrites: Writes[Project] = (
-    (JsPath \ "id").write[Int] and
+      (JsPath \ "id").write[Int] and
       (JsPath \ "projectName").write[String] and
       (JsPath \ "projectDescription").write[String]
     )(unlift(Project.unapply))
@@ -37,7 +38,7 @@ object Project extends SQLSyntaxSupport[Project] {
 
   val p = Project.syntax("p")
 
-  val te = TimeEntry.syntax("te")
+  val te = TimeEntry.syntax
 
   override val autoSession = AutoSession
 
@@ -55,7 +56,7 @@ object Project extends SQLSyntaxSupport[Project] {
     withSQL{
       select(distinct(p.resultAll)).from(Project as p)
         .innerJoin(TimeEntry as te)
-          .on(p.id, te.projectId)
+        .on(p.id, te.projectId)
         .where.eq(te.employeeId, employeeId)
     }.map(Project(p.resultName)).list.apply()
   }

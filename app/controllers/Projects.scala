@@ -1,16 +1,15 @@
 package controllers
 
-import models.{TimeEntry, ProjectPost, Project}
-import play.api.libs.json._
-import play.api.mvc.Action
+import models.{ProjectPost, TimeEntry, Project}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Controller}
 import scalikejdbc._
+import utils.JsonUtils
 
 /**
- * Created by Thomas Meijers
- * Example REST API ScalaDays 2015
- * Projects controller
+ * Created by ThomasWorkBook on 30/05/15.
  */
-object Projects extends BaseController {
+class Projects extends Controller with JsonUtils{
 
   def getProjects = Action { implicit request =>
     val projects = Project.findAll()
@@ -62,7 +61,7 @@ object Projects extends BaseController {
   def deleteProject(id: Int) = Action(parse.empty) { implicit request =>
     Project.find(id) match {
       case Some(project) =>
-        TimeEntry.findAllBy(sqls.eq(TimeEntry.te.projectId, id)).map{ timeEntry =>
+        TimeEntry.findAllBy(sqls.eq(TimeEntry.te.projectId, id)).foreach{ timeEntry =>
           timeEntry.destroy()
         }
 
@@ -89,11 +88,12 @@ object Projects extends BaseController {
         val timeEntries = TimeEntry.findAllBy(sqls.eq(TimeEntry.te.projectId, id))
 
         val timeEntriesJson = Json.obj("time-entries" -> Seq(
-           timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
+          timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
         ))
 
         Ok(timeEntriesJson)
       case None => NotFound(errorJson("The requested resource could not be found"))
     }
   }
+
 }

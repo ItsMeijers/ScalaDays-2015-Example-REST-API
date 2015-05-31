@@ -1,9 +1,9 @@
 package models
 
-import play.api.libs.json._
 import play.api.libs.functional.syntax._
+import play.api.libs.json.JsPath
 import scalikejdbc._
-import org.joda.time.LocalDate
+import org.joda.time.{LocalDate}
 
 case class Employee(
   id: Int,
@@ -21,14 +21,14 @@ case class Employee(
 
 
 object Employee extends SQLSyntaxSupport[Employee] {
-  
+
   implicit val employeeWrites = (
-        (JsPath \ "id").write[Int] and
-        (JsPath \ "firstName").write[String] and
-        (JsPath \ "prefix").writeNullable[String] and
-        (JsPath \ "lastName").write[String] and
-        (JsPath \ "jobTitle").write[String] and
-        (JsPath \ "birthDate").write[LocalDate]
+    (JsPath \ "id").write[Int] and
+      (JsPath \ "firstName").write[String] and
+      (JsPath \ "prefix").writeNullable[String] and
+      (JsPath \ "lastName").write[String] and
+      (JsPath \ "jobTitle").write[String] and
+      (JsPath \ "birthDate").write[LocalDate]
     )(unlift(Employee.unapply))
 
   override val tableName = "employee"
@@ -58,7 +58,7 @@ object Employee extends SQLSyntaxSupport[Employee] {
   def findAll()(implicit session: DBSession = autoSession): List[Employee] = {
     withSQL(select.from(Employee as e)).map(Employee(e.resultName)).list.apply()
   }
-  
+
   def findByNameAndJobTitle(nameOpt: Option[String], jobTitleOpt: Option[String])(implicit session: DBSession = autoSession) =
     if(nameOpt.isEmpty && jobTitleOpt.isEmpty) Left("No query parameters supplied")
     else Right(

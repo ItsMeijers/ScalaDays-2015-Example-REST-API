@@ -2,17 +2,14 @@ package controllers
 
 import models.{TimeEntryPost, TimeEntry}
 import org.joda.time.DateTime
-import play.api.libs.json._
-import play.api.mvc.Action
-import models.TimeEntry.timeEntryWrites
-import models.TimeEntryPost.timeEntryDataReads
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Controller}
+import utils.JsonUtils
 
 /**
- * Created by Thomas Meijers
- * Example REST API ScalaDays 2015
- * TimeEntries controller
+ * Created by ThomasWorkBook on 30/05/15.
  */
-object TimeEntries extends BaseController{
+class TimeEntries extends Controller with JsonUtils{
 
   def getTimeEntries = Action { implicit request =>
     val timeEntries = TimeEntry.findAll()
@@ -85,7 +82,6 @@ object TimeEntries extends BaseController{
 
         Ok(timeEntriesJson)
       }
-    )
+      )
   }
-
 }

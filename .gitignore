@@ -21,3 +21,4 @@ project/.sbtserver
 project/.sbtserver.lock
 activator
 activator-launch-1.3.2.jar
+.DS_Store

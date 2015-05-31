@@ -4,8 +4,8 @@ import org.joda.time.format.ISODateTimeFormat
 import play.api.libs.json._
 import play.api.libs.functional.syntax._
 import scalikejdbc._
-import scalikejdbc.sqls.distinct
-import org.joda.time.DateTime
+import org.joda.time.{DateTime}
+import scalikejdbc.interpolation.SQLSyntax._
 
 case class TimeEntry(
   id: Int,
@@ -21,6 +21,7 @@ case class TimeEntry(
 
 }
 
+
 object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
 
   private val ISODateTimeFormatter = ISODateTimeFormat.dateTime
@@ -32,7 +33,7 @@ object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
   }
 
   implicit val timeEntryWrites = (
-    (JsPath \ "id").write[Int] and
+      (JsPath \ "id").write[Int] and
       (JsPath \ "startTime").write[DateTime] and
       (JsPath \ "endTime").write[DateTime] and
       (JsPath \ "employeeId").write[Int] and
@@ -55,7 +56,6 @@ object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
   )
 
   val te = TimeEntry.syntax("te")
-
   val e = Employee.syntax
 
   override val autoSession = AutoSession
@@ -64,6 +64,10 @@ object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
     withSQL {
       select.from(TimeEntry as te).where.eq(te.id, id)
     }.map(TimeEntry(te.resultName)).single.apply()
+  }
+
+  def findAll()(implicit session: DBSession = autoSession): List[TimeEntry] = {
+    withSQL(select.from(TimeEntry as te)).map(TimeEntry(te.resultName)).list.apply()
   }
 
   def findFromAndTo(fromOpt: Option[DateTime], toOpt: Option[DateTime])(implicit session: DBSession = autoSession) = {
@@ -83,14 +87,10 @@ object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
     withSQL{
       select(distinct(te.resultAll)).from(TimeEntry as te)
         .innerJoin(Employee as e)
-          .on(e.id, te.employeeId)
+        .on(e.id, te.employeeId)
         .where.eq(e.id, id)
         .orderBy(te.startTime desc)
     }.map(TimeEntry(te.resultName)).list.apply()
-  }
-
-  def findAll()(implicit session: DBSession = autoSession): List[TimeEntry] = {
-    withSQL(select.from(TimeEntry as te).orderBy(te.startTime desc)).map(TimeEntry(te.resultName)).list.apply()
   }
 
   def countAll()(implicit session: DBSession = autoSession): Long = {
@@ -105,7 +105,7 @@ object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
 
   def findAllBy(where: SQLSyntax)(implicit session: DBSession = autoSession): List[TimeEntry] = {
     withSQL {
-      select.from(TimeEntry as te).where.append(sqls"${where}").orderBy(te.startTime desc)
+      select.from(TimeEntry as te).where.append(sqls"${where}")
     }.map(TimeEntry(te.resultName)).list.apply()
   }
 

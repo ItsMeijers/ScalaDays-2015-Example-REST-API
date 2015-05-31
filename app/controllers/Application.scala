@@ -1,22 +1,16 @@
 package controllers
 
+import javax.inject.Inject
+
 import play.api.cache.Cached
-import play.api.libs.json.{JsArray, Json}
+import play.api.libs.json.Json
 import play.api.mvc._
-import scala.concurrent.duration._
-import play.api.Play.current
 
-/**
- * Created by Thomas Meijers
- * Example REST API ScalaDays 2015
- * Controller for the index
- */
-object Application extends BaseController {
+class Application @Inject() (cached: Cached) extends Controller {
 
-  def index = Cached.status(_ => "apiIndex", OK, 7 days) {
+  def index = cached.status(_ => "apiIndex", OK, 5000) {
     Action { implicit request =>
-
-      val indexJson = Json.obj(
+      val json = Json.obj(
         "version" -> "0.1",
         "links" -> Seq(
           Json.obj("rel" -> "projects", "href" -> routes.Projects.getProjects().absoluteURL()),
@@ -24,8 +18,7 @@ object Application extends BaseController {
           Json.obj("rel" -> "time-entries","href" -> routes.TimeEntries.getTimeEntries().absoluteURL())
         )
       )
-
-      Ok(indexJson)
+      Ok(json)
     }
   }
 

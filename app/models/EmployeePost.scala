@@ -9,11 +9,11 @@ import play.api.libs.json.Json
  * Case class for post data of an Employee
  */
 case class EmployeePost (
-  firstName: String,
-  prefix: Option[String] = None,
-  lastName: String,
-  jobTitle: String,
-  birthDate: LocalDate) extends PostData[Employee]{
+                          firstName: String,
+                          prefix: Option[String] = None,
+                          lastName: String,
+                          jobTitle: String,
+                          birthDate: LocalDate) {
 
   def create: Employee = Employee.create(firstName, prefix, lastName, jobTitle, birthDate)
 

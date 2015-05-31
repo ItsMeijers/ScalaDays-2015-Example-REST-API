@@ -1,17 +1,14 @@
 package controllers
 
-import models.{TimeEntry, Project, EmployeePost, Employee}
-import play.api.libs.json._
-import play.api.mvc.Action
-import models.EmployeePost.employeeDataReads
-import models.Employee.employeeWrites
+import models.{Project, TimeEntry, EmployeePost, Employee}
+import play.api.libs.json.Json
+import play.api.mvc.{Action, Controller}
+import utils.JsonUtils
 
 /**
- * Created by Thomas Meijers
- * Example REST API ScalaDays 2015
- * Employees controller
+ * Created by ThomasWorkBook on 30/05/15.
  */
-object Employees extends BaseController{
+class Employees extends Controller with JsonUtils{
 
   def getEmployees = Action { implicit request =>
     val employees = Employee.findAll()
@@ -64,12 +61,12 @@ object Employees extends BaseController{
   def deleteEmployee(id: Int) = Action(parse.empty) { implicit request =>
     Employee.find(id) match {
       case Some(employee) =>
-        TimeEntry.findByEmployee(id).map{ timeEntry =>
+        TimeEntry.findByEmployee(id).foreach{ timeEntry =>
           timeEntry.destroy()
         }
 
         employee.destroy()
-        
+
         NoContent
       case None => NotFound(errorJson("The requested resource could not be found"))
     }
@@ -93,11 +90,11 @@ object Employees extends BaseController{
   def getProjectsForEmployee(id: Int) = Action { implicit request =>
     Employee.find(id).map{ employee =>
       val projects = Project.findByEmployee(id)
-      
+
       val projectsJson = Json.obj("projects" ->
         projects.map(p => addSelfLink(Json.toJson(p), routes.Projects.getProject(p.id)))
       )
-      
+
       Ok(projectsJson)
     } getOrElse NotFound(errorJson("The requested resource could not be found"))
 

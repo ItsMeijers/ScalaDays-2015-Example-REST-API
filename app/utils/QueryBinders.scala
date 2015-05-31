@@ -2,7 +2,7 @@ package utils
 
 import java.util.NoSuchElementException
 
-import org.joda.time.{DateTimeZone, DateTime}
+import org.joda.time.DateTime
 import org.joda.time.format.ISODateTimeFormat
 import play.api.mvc.QueryStringBindable
 
