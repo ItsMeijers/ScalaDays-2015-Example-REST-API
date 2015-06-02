@@ -19,12 +19,6 @@ case class Project(
 
 object Project extends SQLSyntaxSupport[Project] {
 
-  implicit val projectWrites: Writes[Project] = (
-      (JsPath \ "id").write[Int] and
-      (JsPath \ "projectName").write[String] and
-      (JsPath \ "projectDescription").write[String]
-    )(unlift(Project.unapply))
-
   override val tableName = "project"
 
   override val columns = Seq("id", "project_name", "project_description")

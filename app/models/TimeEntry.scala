@@ -24,23 +24,6 @@ case class TimeEntry(
 
 object TimeEntry extends SQLSyntaxSupport[TimeEntry] {
 
-  private val ISODateTimeFormatter = ISODateTimeFormat.dateTime
-  private val ISODateTimeParser = ISODateTimeFormat.dateTimeParser
-
-  implicit val DateTimeFormatter = new Format[DateTime] {
-    def reads(j: JsValue) = JsSuccess(ISODateTimeParser.parseDateTime(j.as[String]))
-    def writes(o: DateTime): JsValue = JsString(ISODateTimeFormatter.print(o))
-  }
-
-  implicit val timeEntryWrites = (
-      (JsPath \ "id").write[Int] and
-      (JsPath \ "startTime").write[DateTime] and
-      (JsPath \ "endTime").write[DateTime] and
-      (JsPath \ "employeeId").write[Int] and
-      (JsPath \ "projectId").write[Int] and
-      (JsPath \ "comment").writeNullable[String]
-    )(unlift(TimeEntry.unapply))
-
   override val tableName = "timeentry"
 
   override val columns = Seq("id", "start_time", "end_time", "employee_id", "project_id", "comment")

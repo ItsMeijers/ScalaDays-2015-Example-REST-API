@@ -1,6 +1,6 @@
 package controllers
 
-import models.{ProjectPost, TimeEntry, Project}
+import models._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import scalikejdbc._
@@ -15,7 +15,10 @@ class Projects extends Controller with JsonUtils{
     val projects = Project.findAll()
 
     val projectsJson = Json.obj("projects" ->
-      projects.map(p => addSelfLink(Json.toJson(p), routes.Projects.getProject(p.id)))
+      projects.map{ p =>
+        val projectData = ProjectData.fromProject(p)
+        addSelfLink(Json.toJson(projectData), routes.Projects.getProject(p.id))
+      }
     )
 
     Ok(projectsJson)
@@ -24,7 +27,8 @@ class Projects extends Controller with JsonUtils{
   def getProject(id: Int) = Action { implicit request =>
     Project.find(id) match {
       case Some(project) =>
-        val projectJson = addSelfLink(Json.toJson(project), routes.Projects.getProject(id))
+        val projectData = ProjectData.fromProject(project)
+        val projectJson = addSelfLink(Json.toJson(projectData), routes.Projects.getProject(id))
 
         val projectJsonWithLinks = projectJson ++ Json.obj("links" -> Seq(
           createLink("time-entries", routes.Projects.getTimeEntriesForProject(id))
@@ -36,7 +40,7 @@ class Projects extends Controller with JsonUtils{
   }
 
   def createProject = Action(parse.json) { implicit request =>
-    request.body.validate[ProjectPost].fold(
+    request.body.validate[ProjectData].fold(
       errors => BadRequest(errorJson(errors)),
       projectData => {
         val project = projectData.create
@@ -47,7 +51,7 @@ class Projects extends Controller with JsonUtils{
   }
 
   def editProject(id: Int) = Action(parse.json) { implicit request =>
-    request.body.validate[ProjectPost].fold(
+    request.body.validate[ProjectData].fold(
       errors => BadRequest(errorJson(errors)),
       projectData => {
         Project.find(id) match {
@@ -76,7 +80,10 @@ class Projects extends Controller with JsonUtils{
     val projects = Project.findAllBy(sqls.like(Project.p.projectName, s"%$projectName%"))
 
     val projectsJson = Json.obj("projects" ->
-      projects.map(p => addSelfLink(Json.toJson(p), routes.Projects.getProject(p.id)))
+      projects.map{ p =>
+        val projectData = ProjectData.fromProject(p)
+        addSelfLink(Json.toJson(projectData), routes.Projects.getProject(p.id))
+      }
     )
 
     Ok(projectsJson)
@@ -88,7 +95,10 @@ class Projects extends Controller with JsonUtils{
         val timeEntries = TimeEntry.findAllBy(sqls.eq(TimeEntry.te.projectId, id))
 
         val timeEntriesJson = Json.obj("time-entries" -> Seq(
-          timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
+          timeEntries.map{ te =>
+            val timeEntryData = TimeEntryData.fromTimeEntry(te)
+            addSelfLink(Json.toJson(timeEntryData), routes.TimeEntries.getTimeEntry(te.id))
+          }
         ))
 
         Ok(timeEntriesJson)

@@ -22,15 +22,6 @@ case class Employee(
 
 object Employee extends SQLSyntaxSupport[Employee] {
 
-  implicit val employeeWrites = (
-    (JsPath \ "id").write[Int] and
-      (JsPath \ "firstName").write[String] and
-      (JsPath \ "prefix").writeNullable[String] and
-      (JsPath \ "lastName").write[String] and
-      (JsPath \ "jobTitle").write[String] and
-      (JsPath \ "birthDate").write[LocalDate]
-    )(unlift(Employee.unapply))
-
   override val tableName = "employee"
 
   override val columns = Seq("id", "first_name", "prefix", "last_name", "job_title", "birth_date")

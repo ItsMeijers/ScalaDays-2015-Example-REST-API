@@ -1,6 +1,6 @@
 package controllers
 
-import models.{Project, TimeEntry, EmployeePost, Employee}
+import models._
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
 import utils.JsonUtils
@@ -14,7 +14,10 @@ class Employees extends Controller with JsonUtils{
     val employees = Employee.findAll()
 
     val employeesJson = Json.obj("employees" ->
-      employees.map(e => addSelfLink(Json.toJson(e), routes.Employees.getEmployee(e.id)))
+      employees.map { e =>
+        val employeeData = EmployeeData.fromEmployee(e)
+        addSelfLink(Json.toJson(employeeData), routes.Employees.getEmployee(e.id))
+      }
     )
 
     Ok(employeesJson)
@@ -23,7 +26,8 @@ class Employees extends Controller with JsonUtils{
   def getEmployee(id: Int) = Action { implicit request =>
     Employee.find(id) match{
       case Some(employee) =>
-        val employeeJson = addSelfLink(Json.toJson(employee), routes.Employees.getEmployee(id))
+        val employeeData = EmployeeData.fromEmployee(employee)
+        val employeeJson = addSelfLink(Json.toJson(employeeData), routes.Employees.getEmployee(id))
 
         val employeeJsonWithLinks = employeeJson ++ Json.obj("links" -> Seq(
           createLink("time-entries", routes.Employees.getTimeEntriesForEmployee(id)),
@@ -36,7 +40,7 @@ class Employees extends Controller with JsonUtils{
   }
 
   def createEmployee = Action(parse.json) { implicit request =>
-    request.body.validate[EmployeePost].fold(
+    request.body.validate[EmployeeData].fold(
       errors => BadRequest(errorJson(errors)),
       employeeData => {
         val employee = employeeData.create
@@ -47,7 +51,7 @@ class Employees extends Controller with JsonUtils{
   }
 
   def editEmployee(id: Int) = Action(parse.json) { implicit request =>
-    request.body.validate[EmployeePost].fold(
+    request.body.validate[EmployeeData].fold(
       errors => BadRequest(errorJson(errors)),
       employeeData => {
         Employee.find(id) match {
@@ -79,7 +83,10 @@ class Employees extends Controller with JsonUtils{
       error => BadRequest(errorJson(error)),
       employees => {
         val employeesJson = Json.obj("employees" ->
-          employees.map(e => addSelfLink(Json.toJson(e), routes.Employees.getEmployee(e.id)))
+          employees.map{ e =>
+            val employeeData = EmployeeData.fromEmployee(e)
+            addSelfLink(Json.toJson(employeeData), routes.Employees.getEmployee(e.id))
+          }
         )
 
         Ok(employeesJson)
@@ -92,7 +99,10 @@ class Employees extends Controller with JsonUtils{
       val projects = Project.findByEmployee(id)
 
       val projectsJson = Json.obj("projects" ->
-        projects.map(p => addSelfLink(Json.toJson(p), routes.Projects.getProject(p.id)))
+        projects.map{ p =>
+          val projectData = ProjectData.fromProject(p)
+          addSelfLink(Json.toJson(projectData), routes.Projects.getProject(p.id))
+        }
       )
 
       Ok(projectsJson)
@@ -101,11 +111,14 @@ class Employees extends Controller with JsonUtils{
   }
 
   def getTimeEntriesForEmployee(id: Int) = Action { implicit request =>
-    Employee.find(id).map{ employee =>
+    Employee.find(id).map { employee =>
       val timeEntries = TimeEntry.findByEmployee(id)
 
       val timeEntriesJson = Json.obj("time-entries" ->
-        timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
+        timeEntries.map { te =>
+          val timeEntryData = TimeEntryData.fromTimeEntry(te)
+          addSelfLink(Json.toJson(timeEntryData), routes.TimeEntries.getTimeEntry(te.id))
+        }
       )
 
       Ok(timeEntriesJson)

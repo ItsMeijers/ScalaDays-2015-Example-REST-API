@@ -8,7 +8,7 @@ import play.api.libs.json.Json
  * Example REST API ScalaDays 2015
  * Case class for post data of an Employee
  */
-case class EmployeePost (
+case class EmployeeData (
                           firstName: String,
                           prefix: Option[String] = None,
                           lastName: String,
@@ -22,6 +22,10 @@ case class EmployeePost (
 
 }
 
-object EmployeePost {
-  implicit val employeeDataReads = Json.reads[EmployeePost]
+object EmployeeData {
+  implicit val employeeDataReads = Json.reads[EmployeeData]
+  
+  implicit val employeeDataWrites = Json.writes[EmployeeData]
+  
+  def fromEmployee(e: Employee): EmployeeData = EmployeeData(e.firstName, e.prefix, e.lastName, e.jobTitle, e.birthDate)
 }

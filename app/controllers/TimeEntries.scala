@@ -1,6 +1,6 @@
 package controllers
 
-import models.{TimeEntryPost, TimeEntry}
+import models._
 import org.joda.time.DateTime
 import play.api.libs.json.Json
 import play.api.mvc.{Action, Controller}
@@ -15,7 +15,10 @@ class TimeEntries extends Controller with JsonUtils{
     val timeEntries = TimeEntry.findAll()
 
     val timeEntriesJson = Json.obj("time-entries" ->
-      timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
+      timeEntries.map{ te =>
+        val timeEntryData = TimeEntryData.fromTimeEntry(te)
+        addSelfLink(Json.toJson(timeEntryData), routes.TimeEntries.getTimeEntry(te.id))
+      }
     )
 
     Ok(timeEntriesJson)
@@ -24,7 +27,9 @@ class TimeEntries extends Controller with JsonUtils{
   def getTimeEntry(id: Int) = Action { implicit request =>
     TimeEntry.find(id) match{
       case Some(timeEntry) =>
-        val timeEntryJson = addSelfLink(Json.toJson(timeEntry), routes.TimeEntries.getTimeEntry(id))
+        val timeEntryData = TimeEntryData.fromTimeEntry(timeEntry)
+
+        val timeEntryJson = addSelfLink(Json.toJson(timeEntryData), routes.TimeEntries.getTimeEntry(id))
 
         val timeEntryJsonWithLinks = timeEntryJson ++ Json.obj("links" -> Seq(
           createLink("employee", routes.Employees.getEmployee(timeEntry.employeeId)),
@@ -37,7 +42,7 @@ class TimeEntries extends Controller with JsonUtils{
   }
 
   def createTimeEntry = Action(parse.json) { implicit request =>
-    request.body.validate[TimeEntryPost].fold(
+    request.body.validate[TimeEntryData].fold(
       errors => BadRequest(errorJson(errors)),
       timeEntryData =>
         if(!timeEntryData.checkTime)
@@ -50,7 +55,7 @@ class TimeEntries extends Controller with JsonUtils{
   }
 
   def editTimeEntry(id: Int) = Action(parse.json) { implicit request =>
-    request.body.validate[TimeEntryPost].fold(
+    request.body.validate[TimeEntryData].fold(
       errors => BadRequest(errorJson(errors)),
       timeEntryData =>
         if(!timeEntryData.checkTime)
@@ -77,7 +82,10 @@ class TimeEntries extends Controller with JsonUtils{
       error => BadRequest(errorJson(error)),
       timeEntries => {
         val timeEntriesJson = Json.obj("time-entries" ->
-          timeEntries.map(te => addSelfLink(Json.toJson(te), routes.TimeEntries.getTimeEntry(te.id)))
+          timeEntries.map{ te =>
+            val timeEntryData = TimeEntryData.fromTimeEntry(te)
+            addSelfLink(Json.toJson(timeEntryData), routes.TimeEntries.getTimeEntry(te.id))
+          }
         )
 
         Ok(timeEntriesJson)

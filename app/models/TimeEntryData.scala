@@ -9,7 +9,7 @@ import play.api.libs.json._
  * Example REST API ScalaDays 2015
  * Case class for post data of an TimeEntry
  */
-case class TimeEntryPost(
+case class TimeEntryData(
                           startTime: DateTime,
                           endTime: DateTime,
                           employeeId: Int,
@@ -22,9 +22,10 @@ case class TimeEntryPost(
     id => TimeEntry(id, startTime, endTime, employeeId, projectId, comment).save()
 
   def checkTime: Boolean = startTime.isBefore(endTime)
+
 }
 
-object TimeEntryPost {
+object TimeEntryData {
 
   private lazy val ISODateTimeFormatter = ISODateTimeFormat.dateTimeNoMillis
   private lazy val ISODateTimeParser = ISODateTimeFormat.dateTimeParser
@@ -34,6 +35,10 @@ object TimeEntryPost {
     def writes(o: DateTime): JsValue = JsString(ISODateTimeFormatter.print(o))
   }
 
-  implicit val timeEntryDataReads = Json.reads[TimeEntryPost]
+  implicit val timeEntryDataReads = Json.reads[TimeEntryData]
+  implicit val timeEntryDataWrites = Json.writes[TimeEntryData]
+
+  def fromTimeEntry(te: TimeEntry): TimeEntryData =
+    TimeEntryData(te.startTime, te.endTime, te.employeeId, te.projectId, te.comment)
 
 }
